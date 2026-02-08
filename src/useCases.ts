@@ -212,6 +212,7 @@ export class UseCases {
 
     let [newTransactions, remainingBalance] = this.calculateBalanceTransactions(newBalance)
     transactions.push(...newTransactions)
+    transactions = transactions.sort((a, b) => a.from < b.from ? 1 : -1);
     return [transactions, remainingBalance];
   }
 
