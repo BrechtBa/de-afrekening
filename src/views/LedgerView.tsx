@@ -11,13 +11,14 @@ import { useCases } from "../factory";
 
 import { ListLedgers } from "./ListLedgersView";
 import { EditUserDialog } from "../components/EditUserDialog";
+import { KeyPad } from "../components/KeyPad";
 
 
 
 function LedgerUser({user, balance, addRecord}: {user: User, balance: {total: number, owed: number}, addRecord: (record: NewRecord) => void}) {
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [newRecord, setNewRecord] = useState<{amount: string}>({amount: "50"});
+  const [newRecord, setNewRecord] = useState<{amount: string}>({amount: ""});
 
   const validateAmount = (amount: string) => {
     return isNaN(parseFloat(amount))
@@ -28,7 +29,7 @@ function LedgerUser({user, balance, addRecord}: {user: User, balance: {total: nu
       return;
     }
     addRecord({amount: parseFloat(newRecord.amount)});
-    setNewRecord({amount: "50"});
+    setNewRecord({amount: ""});
     setDialogOpen(false);
   }
 
@@ -46,8 +47,8 @@ function LedgerUser({user, balance, addRecord}: {user: User, balance: {total: nu
         <div style={{width: "100%"}}>
           <div style={{display: "flex", gap: "1em"}}>
             <div style={{flexGrow: 1}}>{user.name}</div>
-            <Button onClick={() => addRecord({amount: 50})} variant="outlined" style={{height: "2.5em"}}>+50</Button>
-            <Button onClick={() => setDialogOpen(true)} variant="outlined" style={{height: "2.5em"}}>Add</Button>
+            <Button onClick={() => addRecord({amount: 50})} variant="outlined" style={{height: "3em"}}>+50</Button>
+            <Button onClick={() => setDialogOpen(true)} variant="outlined" style={{height: "3em"}}>Add</Button>
           </div>
           <div style={{display: "flex", fontSize: "0.9em", color: "#555"}}>
             <div style={{flexGrow: 1}}>
@@ -64,7 +65,13 @@ function LedgerUser({user, balance, addRecord}: {user: User, balance: {total: nu
           Bedrag toevoegen
         </DialogTitle>
         <DialogContent>
-          <TextField label="Bedrag" value={newRecord.amount} onChange={e => setNewRecord(n => ({...n, amount: e.target.value}))} error={validateAmount(newRecord.amount)}/>
+
+          <TextField disabled label="Ander bedrag" value={newRecord.amount} onChange={e => setNewRecord(n => ({...n, amount: e.target.value}))} error={validateAmount(newRecord.amount)} style={{marginTop: "0.5em", width: "100%"}}/>
+          
+          <div style={{marginTop: "1em"}}>
+            <KeyPad value={newRecord.amount} onChange={value => setNewRecord(n => ({...n, amount: value}))}/>
+          </div>
+
         </DialogContent>
         <DialogActions>
           <Button onClick={()=> setDialogOpen(false)}>Cancel</Button>
@@ -341,7 +348,6 @@ export function EditLedger() {
         <Share />
         <div>Een kopie delen</div>
       </a>
-
 
       <Snackbar open={snackbarOpen} autoHideDuration={1000} onClose={() => setSnackbarOpen(false)} message={snackbarMessage} />
 
