@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, List, ListItemAvatar, Paper } from "@mui/material";
-import { ArrowBack, Delete } from "@mui/icons-material";
+import { ArrowBack, Delete, Edit } from "@mui/icons-material";
 
 
 import type { Ledger, Record } from "../domain";
@@ -44,7 +44,7 @@ function LedgerUserRecord({record, deleteRecord}: {record: Record, deleteRecord:
         <DialogTitle>
           Verwijderen
         </DialogTitle>
-        <DialogContent>
+        <DialogContent style={{paddingTop: "0.3em"}}>
           <DialogContentText>
           </DialogContentText>
         </DialogContent>
@@ -117,7 +117,9 @@ export function EditLedgerUser() {
             </ListItemAvatar>
             
             <h1>{user.name}</h1>
-            
+
+             <Edit sx={{ fontSize: 15 }} style={{marginLeft: "0.2em", marginTop: "-0.2em"}}/>
+             
           </EditUserDialog>
         </div>
         <NavLink to={`/${ledger.key}`}><ArrowBack/></NavLink>

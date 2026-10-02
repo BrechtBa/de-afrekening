@@ -40,7 +40,7 @@ function AddLedger({addLedger}: {addLedger: (ledger: NewLedger) => void}) {
 
   return (
     <div>
-      <div style={{display: "flex", justifyContent:"flex-end"}}>
+      <div>
         <Fab color="primary" aria-label="add" onClick={() => setDialogOpen(true)}>
           <Add />
         </Fab>
@@ -51,11 +51,8 @@ function AddLedger({addLedger}: {addLedger: (ledger: NewLedger) => void}) {
           Rekening toevoegen
         </DialogTitle>
 
-        <DialogContent>
-          <DialogContentText>
-          </DialogContentText>
-
-          <TextField label="Name" value={newLedger.name} onChange={e => setNewLedger(n => ({...n, name: e.target.value}))} />
+        <DialogContent  style={{gap: "0.5em", paddingTop: "0.3em"}}>
+          <TextField label="Naam" value={newLedger.name} onChange={e => setNewLedger(n => ({...n, name: e.target.value}))} />
         </DialogContent>
 
         <DialogActions>

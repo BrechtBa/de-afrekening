@@ -42,7 +42,7 @@ export function EditUserDialog({title, user, handleSave, handleDelete, children}
         <DialogTitle>
           {title}
         </DialogTitle>
-        <DialogContent style={{display: "flex", flexDirection: "column", gap: "0.5em"}}>
+        <DialogContent style={{display: "flex", flexDirection: "column", gap: "0.5em", paddingTop: "0.3em"}}>
           <TextField label="Naam" value={newUser.name} onChange={e => setNewUser(n => ({...n, name: e.target.value}))}/>
           <TextField label="Aandeel" value={newUser.share} onChange={e => setNewUser(n => ({...n, share: e.target.value}))} error={validateShare(newUser.share)}/>
         </DialogContent>

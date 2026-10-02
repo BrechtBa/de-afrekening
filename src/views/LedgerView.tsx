@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 
-import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Fab, List, ListItem, ListItemAvatar, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
-import { Add, ArrowBack, ArrowDropDown, ArrowDropUp, LocalBar, Share } from "@mui/icons-material";
-
+import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Fab, IconButton, List, ListItem, ListItemAvatar, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
+import { Add, ArrowBack, ArrowDropDown, ArrowDropUp, LocalBar, Share, Edit } from "@mui/icons-material";
 
 import type { Ledger, User } from "../domain";
 import { NavLink, useNavigate, useParams } from "react-router";
@@ -64,9 +63,9 @@ function LedgerUser({user, balance, addRecord}: {user: User, balance: {total: nu
         <DialogTitle>
           Bedrag toevoegen
         </DialogTitle>
-        <DialogContent>
+        <DialogContent style={{paddingTop: "0.3em"}}>
 
-          <TextField disabled label="Ander bedrag" value={newRecord.amount} onChange={e => setNewRecord(n => ({...n, amount: e.target.value}))} error={validateAmount(newRecord.amount)} style={{marginTop: "0.5em", width: "100%"}}/>
+          <TextField disabled label="Ander bedrag" value={newRecord.amount} onChange={e => setNewRecord(n => ({...n, amount: e.target.value}))} error={validateAmount(newRecord.amount)} style={{width: "100%"}}/>
           
           <div style={{marginTop: "1em"}}>
             <KeyPad value={newRecord.amount} onChange={value => setNewRecord(n => ({...n, amount: value}))}/>
@@ -297,17 +296,16 @@ export function EditLedger() {
               <LocalBar/>
             </Avatar>
           </ListItemAvatar>
-          <h1 style={{flexGrow: 1, alignItems: "start"}}>{ledger.name}</h1>
+          <h1 style={{alignItems: "start"}}>{ledger.name}</h1>
+          <Edit sx={{ fontSize: 15 }} style={{marginLeft: "0.2em", marginTop: "-0.2em"}}/>
         </div>
 
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
           <DialogTitle>
             Rekening aanpassen
           </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-            </DialogContentText>
-            <TextField value={newLedger.name} onChange={e => setNewLedger(n => ({...n, name: e.target.value}))}/>
+          <DialogContent style={{gap: "0.5em", paddingTop: "0.3em"}}>
+            <TextField label="Naam" value={newLedger.name} onChange={e => setNewLedger(n => ({...n, name: e.target.value}))}/>
           </DialogContent>
           <DialogActions>
             <Button onClick={()=> setDialogOpen(false)}>Cancel</Button>
