@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { LedgerName } from "../domain";
 import { useCases } from "../factory";
-import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Fab, List, ListItem, ListItemAvatar, ListItemText, Paper, TextField } from "@mui/material";
+import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogTitle, Fab, List, ListItem, ListItemAvatar, ListItemText, Paper, TextField } from "@mui/material";
 import { NavLink, useNavigate } from "react-router";
 import { Add, LocalBar } from "@mui/icons-material";
 import { stringToColor, type NewLedger } from "../useCases";
@@ -30,11 +30,11 @@ function LedgerListItem({ledger}: {ledger: LedgerName}) {
 
 function AddLedger({addLedger}: {addLedger: (ledger: NewLedger) => void}) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [newLedger, setNewLedger] = useState<NewLedger>({name: ""});
+  const [newLedger, setNewLedger] = useState<NewLedger>({name: "", defaultAmount: 50});
 
   const handleSave = () => {
     addLedger(newLedger);
-    setNewLedger({name: ""});
+    setNewLedger({name: "", defaultAmount: 50});
     setDialogOpen(false);
   }
 

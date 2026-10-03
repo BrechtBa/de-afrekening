@@ -16,6 +16,7 @@ export interface Ledger {
   name: string;
   users: Array<User>;
   records: {[user: string]: Array<Record>};
+  defaultAmount: number;
 }
 
 

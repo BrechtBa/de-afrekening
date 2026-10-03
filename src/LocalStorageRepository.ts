@@ -14,6 +14,7 @@ interface RecordDTO{
 
 interface LedgerDTO {
   name: string;
+  defaultAmount: number;
   users: Array<UserDTO>;
   records: {[user: string]: Array<RecordDTO>}
 }
@@ -95,21 +96,24 @@ export class LocalStorageLedgerRepository implements LedgerRepository {
     return {
       key: key,
       name: ledgerDTO.name,
+      defaultAmount: ledgerDTO.defaultAmount || 50,
       users: ledgerDTO.users.map(user => this.userDTOToUser(user)),
       records: Object.keys(ledgerDTO.records).reduce((acc: {[user: string]: Array<Record>}, v: string) => {
         acc[v] = ledgerDTO.records[v].map(r => this.recordDTOToRecord(r))
         return acc;
-      }, {})
+      }, {}),
+      
     }
   }
   private ledgerToLedgerDTO(ledger: Ledger): LedgerDTO{
     return {
       name: ledger.name,
+      defaultAmount: ledger.defaultAmount,
       users: ledger.users.map(user => this.userToUserDTO(user)),
       records: Object.keys(ledger.records).reduce((acc: {[user: string]: Array<RecordDTO>}, v: string) => {
         acc[v] = ledger.records[v].map(r => this.recordToRecordDTO(r))
         return acc;
-      }, {})
+      }, {}),
     }
 
   }

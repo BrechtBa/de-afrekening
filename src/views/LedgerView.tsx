@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Fab, IconButton, List, ListItem, ListItemAvatar, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
+import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Fab, List, ListItem, ListItemAvatar, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
 import { Add, ArrowBack, ArrowDropDown, ArrowDropUp, LocalBar, Share, Edit } from "@mui/icons-material";
 
 import type { Ledger, User } from "../domain";
@@ -10,11 +10,23 @@ import { useCases } from "../factory";
 
 import { ListLedgers } from "./ListLedgersView";
 import { EditUserDialog } from "../components/EditUserDialog";
-import { KeyPad } from "../components/KeyPad";
+import { NumPad } from "../components/NumPad";
 
 
+function DefaultAmountButton({value, onClick}: {value: number, onClick: () => void}){
+  const formatDefaultAmount = (val: number) => {
+    if(val <= 0) {
+      return val.toString()
+    }
+    return "+" + val.toString()
+  }
+  return (
+    <Button onClick={onClick} variant="outlined" style={{height: "3em"}}>{formatDefaultAmount(value)}</Button>
+  )
+}
 
-function LedgerUser({user, balance, addRecord}: {user: User, balance: {total: number, owed: number}, addRecord: (record: NewRecord) => void}) {
+
+function LedgerUser({user, balance, defaultAmount, addRecord}: {user: User, balance: {total: number, owed: number}, defaultAmount: number, addRecord: (record: NewRecord) => void}) {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newRecord, setNewRecord] = useState<{amount: string}>({amount: ""});
@@ -32,7 +44,6 @@ function LedgerUser({user, balance, addRecord}: {user: User, balance: {total: nu
     setDialogOpen(false);
   }
 
-
   return (
     <Paper style={{marginBottom: "0.5em"}}>
       <ListItem>
@@ -46,7 +57,7 @@ function LedgerUser({user, balance, addRecord}: {user: User, balance: {total: nu
         <div style={{width: "100%"}}>
           <div style={{display: "flex", gap: "1em"}}>
             <div style={{flexGrow: 1}}>{user.name}</div>
-            <Button onClick={() => addRecord({amount: 50})} variant="outlined" style={{height: "3em"}}>+50</Button>
+            {defaultAmount != 0 && <DefaultAmountButton onClick={() => addRecord({amount: defaultAmount})} value={defaultAmount} />}
             <Button onClick={() => setDialogOpen(true)} variant="outlined" style={{height: "3em"}}>Add</Button>
           </div>
           <div style={{display: "flex", fontSize: "0.9em", color: "#555"}}>
@@ -65,10 +76,10 @@ function LedgerUser({user, balance, addRecord}: {user: User, balance: {total: nu
         </DialogTitle>
         <DialogContent style={{paddingTop: "0.3em"}}>
 
-          <TextField disabled label="Ander bedrag" value={newRecord.amount} onChange={e => setNewRecord(n => ({...n, amount: e.target.value}))} error={validateAmount(newRecord.amount)} style={{width: "100%"}}/>
+          <TextField disabled label="Ander bedrag" value={newRecord.amount} error={validateAmount(newRecord.amount)} style={{width: "100%"}}/>
           
           <div style={{marginTop: "1em"}}>
-            <KeyPad value={newRecord.amount} onChange={value => setNewRecord(n => ({...n, amount: value}))}/>
+            <NumPad value={newRecord.amount} onChange={value => setNewRecord(n => ({...n, amount: value}))}/>
           </div>
 
         </DialogContent>
@@ -234,7 +245,9 @@ export function EditLedger() {
   let ledgerKey = params.ledgerKey;
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [newLedger, setNewLedger] = useState<NewLedger>({name: ""});
+  const [numPadDialogOpen, setNumPadDialogOpen] = useState(false);
+  const [newDefaultAmount, setNewDefaultAmount] = useState('');
+  const [newLedger, setNewLedger] = useState<NewLedger>({name: "", defaultAmount: 50});
   const [ledger, setLedger] = useState<Ledger | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -272,6 +285,14 @@ export function EditLedger() {
     navigate("..");
   }
 
+  const parseDefaultAmount = (val: string) => {
+    const floatAmount = parseFloat(val);
+    if(isNaN(floatAmount)) {
+      return 0
+    }
+    return floatAmount
+  }
+
   const share = () => {
     if(navigator.share) {
       navigator.share({url: useCases.makeExportLedgerUrl(ledger)});
@@ -290,7 +311,7 @@ export function EditLedger() {
   return (
     <div>
       <div style={{display: "flex"}}>
-        <div style={{display: "flex", flexGrow: 1, cursor: "pointer"}} onClick={() => {setNewLedger({name: ledger.name}); setDialogOpen(true);}}>
+        <div style={{display: "flex", flexGrow: 1, cursor: "pointer"}} onClick={() => {setNewLedger({name: ledger.name, defaultAmount: ledger.defaultAmount}); setDialogOpen(true);}}>
           <ListItemAvatar>
             <Avatar sx={{bgcolor: stringToColor(ledger.name)}}>
               <LocalBar/>
@@ -304,8 +325,14 @@ export function EditLedger() {
           <DialogTitle>
             Rekening aanpassen
           </DialogTitle>
-          <DialogContent style={{gap: "0.5em", paddingTop: "0.3em"}}>
+          <DialogContent style={{display: "flex", flexDirection: "column", gap: "0.5em", paddingTop: "0.3em"}}>
             <TextField label="Naam" value={newLedger.name} onChange={e => setNewLedger(n => ({...n, name: e.target.value}))}/>
+
+            <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+              Standaard bedrag:
+              <DefaultAmountButton onClick={() => {setNewDefaultAmount(newLedger.defaultAmount.toString()); setNumPadDialogOpen(true);}} value={newLedger.defaultAmount} />
+            </div>
+
           </DialogContent>
           <DialogActions>
             <Button onClick={()=> setDialogOpen(false)}>Cancel</Button>
@@ -314,12 +341,34 @@ export function EditLedger() {
           </DialogActions>
         </Dialog>
       
+
+        <Dialog open={numPadDialogOpen} onClose={() => setNumPadDialogOpen(false)}>
+
+          <DialogTitle>
+            Standaard bedrag:
+          </DialogTitle>
+          <DialogContent style={{paddingTop: "0.3em"}}>
+
+            <TextField disabled label="Ander bedrag" value={newDefaultAmount} style={{width: "100%"}}/>
+            
+            <div style={{marginTop: "1em"}}>
+              <NumPad value={newDefaultAmount} onChange={value => setNewDefaultAmount(value)}/>
+            </div>
+
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={()=> setNumPadDialogOpen(false)}>Cancel</Button>
+            <Button onClick={() => {setNewLedger(n => ({...n, defaultAmount: parseDefaultAmount(newDefaultAmount)})); setNumPadDialogOpen(false);}} autoFocus>Save</Button>
+          </DialogActions>
+
+        </Dialog>
+
         <NavLink to="/"><ArrowBack/></NavLink>
       </div>
       
       <List>
         {ledger.users.map(user => (
-          <LedgerUser key={user.key} user={user} balance={ledgerBalance[user.key]} addRecord={(record: NewRecord) => setLedger(useCases.addRecordToLedgerUser(ledger, user, record))}/>
+          <LedgerUser key={user.key} user={user} balance={ledgerBalance[user.key]} defaultAmount={ledger.defaultAmount} addRecord={(record: NewRecord) => setLedger(useCases.addRecordToLedgerUser(ledger, user, record))}/>
         ))}
       </List>
 

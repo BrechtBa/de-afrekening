@@ -7,7 +7,8 @@ export interface NewUser {
 };
 
 export interface NewLedger {
-  name: string
+  name: string;
+  defaultAmount: number;
 };
 
 export interface NewRecord {
@@ -165,11 +166,12 @@ export class UseCases {
   }
 
   importLedger(ledgerString: string): Ledger {
-    const ledgerData: {name: string, users: Array<{k: string, n: string, s: number}>, records: {[key: string]: Array<{a: number, d: string}>}} = JSON.parse(atob(ledgerString));
+    const ledgerData: {name: string, defaultAmount: number, users: Array<{k: string, n: string, s: number}>, records: {[key: string]: Array<{a: number, d: string}>}} = JSON.parse(atob(ledgerString));
 
     const ledger ={
       key: this.makeKey(),
       name: ledgerData.name,
+      defaultAmount: ledgerData.defaultAmount,
       users: ledgerData.users.map(v => ({key: v.k, name: v.n, share: v.s})),
       records: Object.entries(ledgerData.records).reduce((acc, [k, records]) => ({...acc, [k]: records.map(v => ({amount: v.a, date: new Date(v.d)}))}), {}),
     }
